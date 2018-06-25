@@ -1,29 +1,61 @@
 package com.example.shawn.booksrus;
 
+import android.app.LoaderManager;
+import android.app.LoaderManager.LoaderCallbacks;
+
+import android.content.Context;
+import android.content.Loader;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
-    public static final String REQUEST_URL =
+public class MainActivity extends AppCompatActivity implements LoaderCallbacks<List<Event>> {
+    private static final String REQUEST_URL =
             "https://www.googleapis.com/books/v1/volumes?q=";
 
-    public String result;
+    private String result;
+    private static final int BOOK_LOADER_ID = 1;
+    private BookAdapter myAdapter;
+    private TextView myEmptyStateTextView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ListView bookListView = (ListView) findViewById(R.id.list);
+        myEmptyStateTextView = (TextView) findViewById((R.id.empty_view));
+        bookListView.setEmptyView(myEmptyStateTextView);
+
+        myAdapter = new BookAdapter(this, new ArrayList<Event>());
+        bookListView.setAdapter(myAdapter);
         Button searchButton = (Button) findViewById(R.id.search);
 
         searchButton.setOnClickListener(new View.OnClickListener() {
@@ -31,59 +63,37 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 EditText edit = (EditText) findViewById(R.id.text);
                 result = edit.getText().toString();
+                result = result.replace(' ', '+');
 
-                Toast toast = Toast.makeText(MainActivity.this, result, Toast.LENGTH_LONG);
-                toast.show();
 
                 //clears Edit Text view
                 edit.setText("");
             }
         });
 
-        BookAsyncTask task = new BookAsyncTask();
-        task.execute();
+        ConnectivityManager conMan = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = conMan.getActiveNetworkInfo();
+        if(networkInfo != null && networkInfo.isConnected()){
+            LoaderManager loaderMan = getLoaderManager();
+            loaderMan.initLoader(BOOK_LOADER_ID, null, this);
+
+        }else{
+            View loadingIndicator = findViewById(R.id.loading_indicator);
+            loadingIndicator.setVisibility(View.GONE);
+
+            myEmptyStateTextView.setText("No internet connection");
+        }
+
 
     }
 
-    private class BookAsyncTask extends AsyncTask<URL, Void, Event>{
-        @Override
-        protected Event doInBackground(URL... urls){
-            URL url = createURL(REQUEST_URL);
-
-            String jsonResponse = "";
-
-            try{
-                jsonResponse = makeHttpRequest(url);
-            }catch (IOException e){
-                Log.e("error", "problem in http request");
-            }
-
-            Event book = extractFeatJson(jsonResponse);
-
-            return book;
-        }
-
-        private URL createURL(String newURL){
-            URL url = null;
-            try{
-                result = result.replace(' ', '+');
-                String searched = newURL + result;
-                url = new URL(searched);
-            }catch(MalformedURLException ex){
-                Log.e("error", "creating url");
-                return null;
-            }
-
-            return url;
-        }
-
-        private String makeHttpRequest(URL url) throws IOException{
-            String jsonResponse = "";
-
-            if(url == null)
-                return jsonResponse;
-
-        }
+    @Override
+    public Loader<List<Event>> onCreateLoader(int i, Bundle bundle){
+        return new BookLoader(this, REQUEST_URL);
+    }
+    @Override
+    public void onLoadFinished(Loader<List<Event>> loader,List<Event> books){
+        
     }
 
 }
