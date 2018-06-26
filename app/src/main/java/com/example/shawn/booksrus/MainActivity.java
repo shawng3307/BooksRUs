@@ -36,11 +36,12 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements LoaderCallbacks<List<Event>> {
-    private static final String REQUEST_URL =
+public class MainActivity extends AppCompatActivity implements LoaderCallbacks<List<Event>>{
+    public String REQUEST_URL =
             "https://www.googleapis.com/books/v1/volumes?q=";
 
     private String result;
+    private String search;
     private static final int BOOK_LOADER_ID = 1;
     private BookAdapter myAdapter;
     private TextView myEmptyStateTextView;
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
 
         myAdapter = new BookAdapter(this, new ArrayList<Event>());
         bookListView.setAdapter(myAdapter);
+
         Button searchButton = (Button) findViewById(R.id.search);
 
         searchButton.setOnClickListener(new View.OnClickListener() {
@@ -65,11 +67,16 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
                 result = edit.getText().toString();
                 result = result.replace(' ', '+');
 
+                search = REQUEST_URL + result;
+
+                clicked();
 
                 //clears Edit Text view
                 edit.setText("");
             }
         });
+
+
 
         ConnectivityManager conMan = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = conMan.getActiveNetworkInfo();
@@ -86,14 +93,32 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
 
 
     }
-
+    public void clicked(){
+        getLoaderManager().restartLoader(BOOK_LOADER_ID, null, this);
+    }
+    
     @Override
     public Loader<List<Event>> onCreateLoader(int i, Bundle bundle){
-        return new BookLoader(this, REQUEST_URL);
+
+        return new BookLoader(this, search);
     }
     @Override
     public void onLoadFinished(Loader<List<Event>> loader,List<Event> books){
-        
+        View loadingIndicator = findViewById(R.id.loading_indicator);
+        loadingIndicator.setVisibility(View.GONE);
+
+        myEmptyStateTextView.setText("No Books Found");
+
+        myAdapter.clear();
+
+        if (books != null && !books.isEmpty()) {
+            myAdapter.addAll(books);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<Event>> loader){
+        myAdapter.clear();
     }
 
 }

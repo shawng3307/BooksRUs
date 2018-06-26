@@ -4,13 +4,32 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/lin_layout">
+        <EditText
+            android:id="@+id/text"
+            android:layout_width="300dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="10dp"/>
+        <Button
+            android:id="@+id/search"
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:text="Search"/>
+    </LinearLayout>
+
     <ListView
         android:id="@+id/list"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="@null"
-        android:dividerHeight="0dp"/>
+        android:dividerHeight="0dp"
+        android:layout_below="@id/lin_layout"
+        />
 
     <TextView
         android:id="@+id/empty_view"

@@ -25,7 +25,7 @@ public class Query {
 
     public static ArrayList<Event> fetchBookData(String reqUrl){
         URL url = createURL(reqUrl);
-        String jsonResponse = "";
+        String jsonResponse = null;
 
         try{
             jsonResponse = makeHttpRequest(url);
