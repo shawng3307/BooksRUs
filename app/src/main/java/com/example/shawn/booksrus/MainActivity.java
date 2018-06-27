@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
     public void clicked(){
         getLoaderManager().restartLoader(BOOK_LOADER_ID, null, this);
     }
-    
+
     @Override
     public Loader<List<Event>> onCreateLoader(int i, Bundle bundle){
 
