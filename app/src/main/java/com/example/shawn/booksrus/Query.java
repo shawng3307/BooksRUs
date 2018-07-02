@@ -119,16 +119,20 @@ public class Query {
 
                     String title = volInfo.getString("title");
                     Log.d("Retrieving: ", title);
-                    Event nextEvent = new Event(title);
+
+                    String author;
+                    JSONArray itemAuthor = volInfo.getJSONArray("authors");
+                    if(itemAuthor.length() > 0){
+                        author = itemAuthor.getString(0);
+                        Log.d("author", author);
+                    }
+                    else
+                        author = "No author found";
+
+                    Event nextEvent = new Event(title, author);
                     books.add(nextEvent);
                 }
 
-                /*JSONArray authorArray = firstItem.getJSONArray("authors");
-                if(authorArray.length() > 0){
-                    String author = authorArray.getString(0);
-
-                    return new Event(title, author);
-                }*/
             }
         }catch (JSONException e){
             Log.e("Error", " Problem parsing JSON");

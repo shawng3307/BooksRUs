@@ -9,6 +9,8 @@ import java.util.List;
 import android.content.Context;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 public class BookAdapter extends ArrayAdapter<Event> {
     public BookAdapter(Context context, List<Event> books){
         super(context, 0, books);
@@ -28,6 +30,10 @@ public class BookAdapter extends ArrayAdapter<Event> {
         TextView title = (TextView) listItem.findViewById(R.id.book_title);
         String myTitle = currentBook.getTitle();
         title.setText(myTitle);
+
+        TextView author = (TextView) listItem.findViewById(R.id.book_author);
+        String myAuthor = currentBook.getAuthor();
+        author.setText(myAuthor);
 
         return listItem;
     }
