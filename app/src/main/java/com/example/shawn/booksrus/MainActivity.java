@@ -36,7 +36,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements LoaderCallbacks<List<Event>>{
+public class MainActivity extends AppCompatActivity implements LoaderCallbacks<List<Event>> {
     public String REQUEST_URL =
             "https://www.googleapis.com/books/v1/volumes?q=";
 
@@ -77,14 +77,13 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
         });
 
 
-
         ConnectivityManager conMan = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = conMan.getActiveNetworkInfo();
-        if(networkInfo != null && networkInfo.isConnected()){
+        if (networkInfo != null && networkInfo.isConnected()) {
             LoaderManager loaderMan = getLoaderManager();
             loaderMan.initLoader(BOOK_LOADER_ID, null, this);
 
-        }else{
+        } else {
             View loadingIndicator = findViewById(R.id.loading_indicator);
             loadingIndicator.setVisibility(View.GONE);
 
@@ -93,17 +92,19 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
 
 
     }
-    public void clicked(){
+
+    public void clicked() {
         getLoaderManager().restartLoader(BOOK_LOADER_ID, null, this);
     }
 
     @Override
-    public Loader<List<Event>> onCreateLoader(int i, Bundle bundle){
+    public Loader<List<Event>> onCreateLoader(int i, Bundle bundle) {
 
         return new BookLoader(this, search);
     }
+
     @Override
-    public void onLoadFinished(Loader<List<Event>> loader,List<Event> books){
+    public void onLoadFinished(Loader<List<Event>> loader, List<Event> books) {
         View loadingIndicator = findViewById(R.id.loading_indicator);
         loadingIndicator.setVisibility(View.GONE);
 
@@ -117,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements LoaderCallbacks<L
     }
 
     @Override
-    public void onLoaderReset(Loader<List<Event>> loader){
+    public void onLoaderReset(Loader<List<Event>> loader) {
         myAdapter.clear();
     }
 

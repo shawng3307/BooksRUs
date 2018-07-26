@@ -19,17 +19,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Query {
-    private Query(){
+    private Query() {
 
     }
 
-    public static ArrayList<Event> fetchBookData(String reqUrl){
+    public static ArrayList<Event> fetchBookData(String reqUrl) {
         URL url = createURL(reqUrl);
         String jsonResponse = null;
 
-        try{
+        try {
             jsonResponse = makeHttpRequest(url);
-        }catch (IOException e){
+        } catch (IOException e) {
             Log.e("error", "problem in http request");
         }
 
@@ -38,24 +38,24 @@ public class Query {
         return book;
     }
 
-    private static URL createURL(String newURL){
+    private static URL createURL(String newURL) {
         URL url = null;
-        try{
+        try {
             url = new URL(newURL);
-        }catch(MalformedURLException ex){
+        } catch (MalformedURLException ex) {
             Log.e("error", "creating url");
         }
 
         return url;
     }
 
-    private static String readFromStream(InputStream inputStream) throws IOException{
+    private static String readFromStream(InputStream inputStream) throws IOException {
         StringBuilder output = new StringBuilder();
-        if(inputStream != null){
+        if (inputStream != null) {
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream, Charset.forName("UTF-8"));
             BufferedReader reader = new BufferedReader(inputStreamReader);
             String line = reader.readLine();
-            while(line != null){
+            while (line != null) {
                 output.append(line);
                 line = reader.readLine();
             }
@@ -64,56 +64,56 @@ public class Query {
         return output.toString();
     }
 
-    private static String makeHttpRequest(URL url) throws IOException{
+    private static String makeHttpRequest(URL url) throws IOException {
         String jsonResponse = "";
 
-        if(url == null)
+        if (url == null)
             return jsonResponse;
 
         HttpURLConnection urlConnection = null;
         InputStream inputStream = null;
-        try{
+        try {
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
             urlConnection.setReadTimeout(1000);
             urlConnection.setConnectTimeout(15000);
             urlConnection.connect();
 
-            if(urlConnection.getResponseCode() == 200){
+            if (urlConnection.getResponseCode() == 200) {
                 inputStream = urlConnection.getInputStream();
                 jsonResponse = readFromStream(inputStream);
-            }else{
+            } else {
                 Log.e("error", "code: " + urlConnection.getResponseCode());
 
             }
 
-        }catch(IOException e){
+        } catch (IOException e) {
             Log.e("error", "Problem retrieving results");
-        }finally {
-            if(urlConnection != null){
+        } finally {
+            if (urlConnection != null) {
                 urlConnection.disconnect();
             }
-            if(inputStream != null){
+            if (inputStream != null) {
                 inputStream.close();
             }
         }
         return jsonResponse;
     }
 
-    private static ArrayList<Event> extractFeatJson(String respJSON){
-        if(TextUtils.isEmpty(respJSON)){
+    private static ArrayList<Event> extractFeatJson(String respJSON) {
+        if (TextUtils.isEmpty(respJSON)) {
             return null;
         }
 
         ArrayList<Event> books = new ArrayList<Event>();
 
-        try{
+        try {
             JSONObject baseResponse = new JSONObject(respJSON);
             JSONArray itemArray = baseResponse.getJSONArray("items");
 
 
-            if(itemArray.length() > 0){
-                for(int i = 0; i < itemArray.length(); i++){
+            if (itemArray.length() > 0) {
+                for (int i = 0; i < itemArray.length(); i++) {
                     JSONObject myItem = itemArray.getJSONObject(i);
                     JSONObject volInfo = myItem.getJSONObject("volumeInfo");
 
@@ -122,11 +122,10 @@ public class Query {
 
                     String author;
                     JSONArray itemAuthor = volInfo.getJSONArray("authors");
-                    if(itemAuthor.length() > 0){
+                    if (itemAuthor.length() > 0) {
                         author = itemAuthor.getString(0);
                         Log.d("author", author);
-                    }
-                    else
+                    } else
                         author = "No author found";
 
                     Event nextEvent = new Event(title, author);
@@ -134,7 +133,7 @@ public class Query {
                 }
 
             }
-        }catch (JSONException e){
+        } catch (JSONException e) {
             Log.e("Error", " Problem parsing JSON");
         }
 

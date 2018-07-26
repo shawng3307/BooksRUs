@@ -9,19 +9,19 @@ import java.util.List;
 public class BookLoader extends AsyncTaskLoader<List<Event>> {
     private String myURL;
 
-    public BookLoader(Context context, String url){
+    public BookLoader(Context context, String url) {
         super(context);
         myURL = url;
     }
 
     @Override
-    protected void onStartLoading(){
+    protected void onStartLoading() {
         forceLoad();
     }
 
     @Override
-    public List<Event> loadInBackground(){
-        if(myURL == null)
+    public List<Event> loadInBackground() {
+        if (myURL == null)
             return null;
 
         List<Event> books = Query.fetchBookData(myURL);
